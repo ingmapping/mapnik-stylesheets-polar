@@ -34,10 +34,10 @@ def main():
                       help="file type to render, defaults to "+type)
     
     parser.add_option("-z", "--minzoom", action="store", type="int", dest="minzoom", 
-                      help="minimum zoom level to render, defaults to "+minzoom)
+                      help="minimum zoom level to render, defaults to "+str(minzoom))
     
     parser.add_option("-Z", "--maxzoom", action="store", type="int", dest="maxzoom", 
-                      help="maximum zoom level to render, defaults to "+maxzoom)
+                      help="maximum zoom level to render, defaults to "+str(maxzoom))
     
     (options, args) = parser.parse_args()
     if options.style:
