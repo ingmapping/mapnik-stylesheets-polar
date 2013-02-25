@@ -44,8 +44,9 @@ if [ ! -e $OUTDIR ]; then
 fi
 
 $WGET http://tile.openstreetmap.org/world_boundaries-spherical.tgz -O $OUTDIR/world_boundaries-spherical.tgz
-$WGET http://tile.openstreetmap.org/processed_p.tar.bz2 -O $OUTDIR/processed_p.tar.bz2
-$WGET http://tile.openstreetmap.org/shoreline_300.tar.bz2 -O $OUTDIR/shoreline_300.tar.bz2
+#$WGET http://tile.openstreetmap.org/processed_p.tar.bz2 -O $OUTDIR/processed_p.tar.bz2
+#$WGET http://tile.openstreetmap.org/shoreline_300.tar.bz2 -O $OUTDIR/shoreline_300.tar.bz2
+$WGET http://data.openstreetmapdata.com/land-polygons-complete-4326.zip
 $WGET http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places.zip -O $OUTDIR/ne_10m_populated_places.zip
 $WGET http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_boundary_lines_land.zip -O $OUTDIR/ne_110m_admin_0_boundary_lines_land.zip
 
@@ -53,18 +54,11 @@ $TAR xvf $OUTDIR/world_boundaries-spherical.tgz -C $OUTDIR
 
 if [ -d $OUTDIR/world_boundaries ]; then
 
-	if [ -f $OUTDIR/processed_p.tar.bz2 ]; then
-		$TAR xvf $OUTDIR/processed_p.tar.bz2 -C $OUTDIR
+	if [ -f $OUTDIR/land-polygons-complete-4326.zip ]; then
+		$UNZIP -o $OUTDIR/land-polygons-complete-4326.zip $OUTDIR/world_boundaries
 		mv $OUTDIR/processed_p.[dis]* $OUTDIR/world_boundaries/
 	else
-		echo 'processed_p.tar.bz2 not present'
-	fi
-
-	if [ -f $OUTDIR/shoreline_300.tar.bz2 ]; then
-		$TAR xvf $OUTDIR/shoreline_300.tar.bz2 -C $OUTDIR
-		mv $OUTDIR/shoreline_300.[dis]* $OUTDIR/world_boundaries/
-	else
-		echo 'shoreline_300.tar.bz2 not present'
+		echo 'land-polygons-complete-4326.zip not present'
 	fi
 
 	if [ -f $OUTDIR/ne_10m_populated_places.zip ]; then

@@ -34,21 +34,21 @@
       <PolygonSymbolizer fill="#ddd"/>
     </Rule>
 </Style>
-<Layer name="world" status="on" srs="&srs900913;">
+<Layer name="world" status="on" srs="&srs4326;">
     <StyleName>world</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">&world_boundaries;/shoreline_300</Parameter>
+      <Parameter name="file">/home/peter/osm/data/land-polygons-complete-4326/land_polygons</Parameter>
     </Datasource>
 </Layer>
-<Layer name="coast-poly" status="on" srs="&srs900913;">
+<Layer name="coast-poly" status="on" srs="&srs4326;">
     <StyleName>coast-poly</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">&world_boundaries;/processed_p</Parameter>
+      <Parameter name="file">/home/peter/osm/data/land-polygons-complete-4326/land_polygons</Parameter>
     </Datasource>
 </Layer>
-<Layer name="builtup" status="on" srs="&srsmercator;">
+<Layer name="builtup" status="off" srs="&srsmercator;">
     <StyleName>builtup</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
