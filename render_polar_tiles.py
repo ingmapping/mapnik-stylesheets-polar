@@ -7,9 +7,9 @@ from optparse import OptionParser
 import sys, os, multiprocessing
 
 try:
-    import mapnik2 as mapnik
-except:
     import mapnik
+except:
+    import mapnik2 as mapnik
 
 cairo_exists = True
 
@@ -46,6 +46,9 @@ def main():
     parser.add_option("-T", "--threads", action="store", type="int", dest="threads", 
                       help="number of threads to launch, defaults to "+str(threads))
     
+    parser.add_option("-e", "--skip-existing", action="store_true", dest="skipexisting", 
+                      help="skip existing tiles, only render missing")
+    
     (options, args) = parser.parse_args()
     if options.style:
         style = options.style
@@ -78,6 +81,8 @@ def main():
             n = 2**z
             for x in range(0, n):
                 for y in range(0, n):
+                    if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
+                        continue
                     t = (z, x, y)
                     queue.put(t)
 
@@ -99,6 +104,8 @@ def main():
             n = 2**z
             for x in range(0, n):
                 for y in range(0, n):
+                    if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
+                        continue
                     render_tile(m, z, x, y, scale, dir, type)
 
 class RenderThread:
@@ -153,9 +160,14 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
             os.makedirs(pdir)
         lock.release()
     else:
+        if not os.path.exists(pdir):
+            os.makedirs(pdir)
         print "z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
 
-    e = mapnik.Envelope(*bbox)
+    if mapnik.Box2d:
+        e = mapnik.Box2d(*bbox)
+    else:
+        e = mapnik.Envelope(*bbox)
     
     # zoom map to bounding box
     m.zoom_to_box(e)
