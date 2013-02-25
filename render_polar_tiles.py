@@ -122,6 +122,9 @@ class RenderThread:
         m = mapnik.Map(255,255)
         mapnik.load_map(m, self.style, True)
 
+        if(m.buffer_size < 128):
+            m.buffer_size = 128
+
         while True:
             r = self.queue.get()
             if (r == None):
