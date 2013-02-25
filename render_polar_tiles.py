@@ -25,7 +25,7 @@ def main():
     scale = 6000000
     minzoom = 1
     maxzoom = 6
-    threads = multiprocessing.cpu_count() - 1
+    threads = 1
     
     parser = OptionParser()
     parser.add_option("-s", "--style", action="store", type="string", dest="style", 
@@ -44,7 +44,7 @@ def main():
                       help="maximum zoom level to render, defaults to "+str(maxzoom))
     
     parser.add_option("-T", "--threads", action="store", type="int", dest="threads", 
-                      help="number of threads to launch, defaults to "+str(threads)+" (CPUs-1)")
+                      help="number of threads to launch, defaults to "+str(threads))
     
     (options, args) = parser.parse_args()
     if options.style:
