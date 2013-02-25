@@ -6,10 +6,7 @@
 from optparse import OptionParser
 import sys, os
 
-try:
-    import mapnik2 as mapnik
-except:
-    import mapnik
+import mapnik
 
 cairo_exists = True
 
@@ -101,7 +98,7 @@ def main():
     
     # project bounds to map projection
     #e = mapnik.forward_(mapnik.Envelope(*bbox), prj)
-    e = mapnik.Envelope(*bbox)
+    e = mapnik.Box2d(*bbox)
     
     # zoom map to bounding box
     m.zoom_to_box(e)
