@@ -144,10 +144,13 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
         tilesize * (x2n+1),
         tilesize * (y2n+1)
     ]
+    pdir = dir + "/" + str(z) + "/" + str(x)
 
     if lock:
         lock.acquire()
         print "Thread #%u: z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (threadnum, z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
+        if not os.path.exists(pdir):
+            os.makedirs(pdir)
         lock.release()
     else:
         print "Single-Thread: z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
@@ -157,10 +160,6 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
     # zoom map to bounding box
     m.zoom_to_box(e)
     
-    pdir = dir + "/" + str(z) + "/" + str(x)
-    if not os.path.exists(pdir):
-        os.makedirs(pdir)
-
     file = dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type
     s = mapnik.Image(255, 255)
     
