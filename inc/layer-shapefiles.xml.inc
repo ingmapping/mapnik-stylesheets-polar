@@ -38,14 +38,14 @@
     <StyleName>world</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/peter/osm/data/land-polygons-complete-4326/land_polygons</Parameter>
+      <Parameter name="file">&world_boundaries;/land-polygons-complete-4326/land_polygons</Parameter>
     </Datasource>
 </Layer>
 <Layer name="coast-poly" status="on" srs="&srs4326;">
     <StyleName>coast-poly</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/peter/osm/data/land-polygons-complete-4326/land_polygons</Parameter>
+      <Parameter name="file">&world_boundaries;/land-polygons-complete-4326/land_polygons</Parameter>
     </Datasource>
 </Layer>
 <Layer name="builtup" status="off" srs="&srsmercator;">
