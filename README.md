@@ -70,6 +70,9 @@ Then customize the xml entities (the files in the inc/ directory) which are
 used by the 'osm.xml' to your setup. You can either use the 'generate_xml.py' 
 script or manually edit a few files inside the 'inc' directory.
 
+Don't forget to import the data using '--latlong' and specify '--epsg 4326'
+on generate_xml.py.
+
 Finally try rendering a few maps using either 'generate_image.py',
 'generate_tiles.py' or 'nik2img.py'.
 
