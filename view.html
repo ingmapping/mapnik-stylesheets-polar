@@ -28,13 +28,24 @@
 			right: 5px !important;
 		}
 
-		.olControlAttribution, .olControlPermalink {
+
+		.time {
+			position: absolute;
+			bottom: 30px; !important;
+			left: 5px !important;
+			z-index: 9999;
+			font-size: smaller;
+		}
+
+		.olControlAttribution, .olControlPermalink, .time {
 			background: white;
 			opacity: 0.3;
 			padding: 2px 6px;
+
+			z-index: 9999;
 		}
 
-		.olControlAttribution:hover, .olControlPermalink:hover {
+		.olControlAttribution:hover, .olControlPermalink:hover, .time:hover {
 			opacity: 0.8;
 		}
 
@@ -45,7 +56,9 @@
 		<script type="text/javascript" src="http://libs.personalwerk.de/openlayers/2.12/OpenLayers.debug.js"></script>
 	</head>
 	<body>
-		<div id="map"></div>
+		<div id="map">
+			<div class="time">Last Update (of all Tiles): ###TIME###</div>
+		</div>
 
 		<script>
 		var map = new OpenLayers.Map('map', {
@@ -53,7 +66,9 @@
 				new OpenLayers.Control.Navigation(),
 				new OpenLayers.Control.PanZoomBar(),
 				new OpenLayers.Control.Attribution(), 
-				new OpenLayers.Control.Permalink()
+				new OpenLayers.Control.Permalink({
+					anchor: true
+				})
 			],
 
 			projection: ''
@@ -67,18 +82,17 @@
 				//maxResolution: 2929.6875,
 				projection: 'EPSG:3031', //WGS 84 / Antarctic Polar Stereographic
 				units: 'meters',
-				minZoomLevel: 1,
 				attribution: '© <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-				numZoomLevels: 10,
+				numZoomLevels: 13,
 				transitionEffect: 'resize'
 			}
 		)
 
 		map.addLayers([layer]);
 		
-		var args = OpenLayers.Util.getParameters();
-		if(!args.lat || !args.lon || !args.zoom)
+		if(map.zoom == 0)
 			map.setCenter(new OpenLayers.LonLat(0, 0), 1);
+
 
 		</script>
 	</body>
