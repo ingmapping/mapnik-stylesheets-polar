@@ -6,7 +6,10 @@
 from optparse import OptionParser
 import sys, os
 
-import mapnik
+try:
+    import mapnik2 as mapnik
+except:
+    import mapnik
 
 cairo_exists = True
 
@@ -84,7 +87,7 @@ def render_tile(m, z, x, y, scale, dir, type):
     ]
     print "z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
 
-    e = mapnik.Box2d(*bbox)
+    e = mapnik.Envelope(*bbox)
     
     # zoom map to bounding box
     m.zoom_to_box(e)
