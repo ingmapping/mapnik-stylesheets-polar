@@ -5,6 +5,7 @@
 
 from optparse import OptionParser
 import sys, os, multiprocessing
+import Queue
 
 try:
     import mapnik
@@ -45,7 +46,10 @@ def main():
     
     parser.add_option("-T", "--threads", action="store", type="int", dest="threads", 
                       help="number of threads to launch, defaults to "+str(threads))
-    
+
+    parser.add_option("-i", "--only-interesting", action="store_true", dest="onlyinteresting", 
+                      help="only render around interesting places (buildings, peaks, islands, ...)")
+
     parser.add_option("-e", "--skip-existing", action="store_true", dest="skipexisting", 
                       help="skip existing tiles, only render missing")
     
@@ -65,9 +69,18 @@ def main():
     if options.maxzoom:
         maxzoom = options.maxzoom
     
+    queue = multiprocessing.JoinableQueue(32)
+    
+    for z in range(minzoom, maxzoom+1):
+        n = 2**z
+        for x in range(0, n):
+            for y in range(0, n):
+                if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
+                    continue
+                t = (z, x, y)
+                queue.put(t)
     
     if(options.threads > 1):
-        queue = multiprocessing.JoinableQueue(32)
         lock = multiprocessing.Lock()
 
         renderers = {}
@@ -76,15 +89,6 @@ def main():
             render_thread = multiprocessing.Process(target=renderer.run)
             render_thread.start()
             renderers[i] = render_thread
-
-        for z in range(minzoom, maxzoom+1):
-            n = 2**z
-            for x in range(0, n):
-                for y in range(0, n):
-                    if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
-                        continue
-                    t = (z, x, y)
-                    queue.put(t)
 
         # Signal render threads to exit by sending empty request to queue
         for i in range(options.threads):
@@ -95,18 +99,17 @@ def main():
         for i in range(options.threads):
             renderers[i].join()
 
-
     else:
         m = mapnik.Map(255,255)
         mapnik.load_map(m, style)
         
-        for z in range(minzoom, maxzoom+1):
-            n = 2**z
-            for x in range(0, n):
-                for y in range(0, n):
-                    if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
-                        continue
-                    render_tile(m, z, x, y, scale, dir, type)
+        while True:
+            try:
+                r = queue.get(False)
+                (z, x, y) = r
+                render_tile(m, z, x, y, scale, dir, type)
+            except Queue.Empty:
+                break;
 
 class RenderThread:
     def __init__(self, threadnum, queue, style, scale, dir, type, lock):
