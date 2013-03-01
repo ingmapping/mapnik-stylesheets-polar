@@ -6,6 +6,7 @@
 from optparse import OptionParser
 import sys, os, multiprocessing
 import Queue
+from math import floor, ceil
 
 try:
     import mapnik
@@ -76,16 +77,53 @@ def main():
         threads = options.threads
     
     queue = multiprocessing.JoinableQueue(32)
-    
+
+    lock = multiprocessing.Lock()
+
+    renderers = {}
+    print "Starting %u render-threads" % (threads)
+    for i in range(threads):
+        renderer = RenderThread(i, queue, style, scale, dir, type, lock)
+        render_thread = multiprocessing.Process(target=renderer.run)
+        render_thread.start()
+        renderers[i] = render_thread
+
     if options.onlyinteresting:
         import psycopg2
         con = psycopg2.connect(options.dsn)
-        sql = """SELECT ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
-            WHERE place IS NOT NULL
-            OR building IS NOT NULL
-            OR ("natural" is NULL AND "natural" != 'water');
-        """;
-        print sql
+        sql = "SELECT ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point WHERE osm_id = 515065315"
+        
+        #    WHERE place IS NOT NULL
+        #    OR building IS NOT NULL
+        #    OR ("natural" is NULL AND "natural" != 'water');
+        #""";
+        cur = con.cursor()
+        cur.execute(sql)
+        for record in cur:
+            (xmeter, ymeter) = record
+            print "meter", xmeter, ymeter
+            xfactor = xmeter / scale
+            yfactor = ymeter / scale
+
+            for z in range(minzoom, maxzoom+1):
+                n = 2**z
+                x = int(round( (xfactor * n) + (n/2) ))
+                y = int(round( (n/2) - (yfactor * n) - 1 ))
+
+                queue.put( (z, x-1, y-1) )
+                queue.put( (z, x,   y-1) )
+                queue.put( (z, x+1, y-1) )
+                queue.put( (z, x-1, y  ) )
+                queue.put( (z, x,   y  ) )
+                queue.put( (z, x+1, y  ) )
+                queue.put( (z, x-1, y+1) )
+                queue.put( (z, x,   y+1) )
+                queue.put( (z, x+1, y+1) )
+
+        # idea 1: calculate tile numbers at minzoom, project to maxzoom (simpler)
+
+
+        # idea 2: add a buffer around the coords and render all tiles inside this bbox (more logic)
     
     else:
         for z in range(minzoom, maxzoom+1):
@@ -96,23 +134,14 @@ def main():
                         continue
                     t = (z, x, y)
                     queue.put(t)
-    
-    lock = multiprocessing.Lock()
-    
-    renderers = {}
-    for i in range(options.threads):
-        renderer = RenderThread(i, queue, style, scale, dir, type, lock)
-        render_thread = multiprocessing.Process(target=renderer.run)
-        render_thread.start()
-        renderers[i] = render_thread
 
     # Signal render threads to exit by sending empty request to queue
-    for i in range(options.threads):
+    for i in range(threads):
         queue.put(None)
 
     # wait for pending rendering jobs to complete
     queue.join()
-    for i in range(options.threads):
+    for i in range(threads):
         renderers[i].join()
 
 class RenderThread:
@@ -124,8 +153,10 @@ class RenderThread:
         self.type = type
         self.lock = lock
         self.style = style
+        print "Thread #%u created" % (threadnum)
 
     def run(self):
+        print "Thread #%u started" % (self.threadnum)
         m = mapnik.Map(255,255)
         mapnik.load_map(m, self.style, True)
 
