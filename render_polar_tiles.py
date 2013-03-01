@@ -71,6 +71,9 @@ def main():
     
     if options.maxzoom:
         maxzoom = options.maxzoom
+
+    if options.threads:
+        threads = options.threads
     
     queue = multiprocessing.JoinableQueue(32)
     
@@ -94,36 +97,23 @@ def main():
                     t = (z, x, y)
                     queue.put(t)
     
-    if(options.threads > 1):
-        lock = multiprocessing.Lock()
+    lock = multiprocessing.Lock()
+    
+    renderers = {}
+    for i in range(options.threads):
+        renderer = RenderThread(i, queue, style, scale, dir, type, lock)
+        render_thread = multiprocessing.Process(target=renderer.run)
+        render_thread.start()
+        renderers[i] = render_thread
 
-        renderers = {}
-        for i in range(options.threads):
-            renderer = RenderThread(i, queue, style, scale, dir, type, lock)
-            render_thread = multiprocessing.Process(target=renderer.run)
-            render_thread.start()
-            renderers[i] = render_thread
+    # Signal render threads to exit by sending empty request to queue
+    for i in range(options.threads):
+        queue.put(None)
 
-        # Signal render threads to exit by sending empty request to queue
-        for i in range(options.threads):
-            queue.put(None)
-
-        # wait for pending rendering jobs to complete
-        queue.join()
-        for i in range(options.threads):
-            renderers[i].join()
-
-    else:
-        m = mapnik.Map(255,255)
-        mapnik.load_map(m, style)
-        
-        while True:
-            try:
-                r = queue.get(False)
-                (z, x, y) = r
-                render_tile(m, z, x, y, scale, dir, type)
-            except Queue.Empty:
-                break;
+    # wait for pending rendering jobs to complete
+    queue.join()
+    for i in range(options.threads):
+        renderers[i].join()
 
 class RenderThread:
     def __init__(self, threadnum, queue, style, scale, dir, type, lock):
