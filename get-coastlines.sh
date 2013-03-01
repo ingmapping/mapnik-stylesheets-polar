@@ -55,7 +55,7 @@ $TAR xvf $OUTDIR/world_boundaries-spherical.tgz -C $OUTDIR
 if [ -d $OUTDIR/world_boundaries ]; then
 
 	if [ -f $OUTDIR/land-polygons-complete-4326.zip ]; then
-		$UNZIP -o $OUTDIR/land-polygons-complete-4326.zip $OUTDIR/world_boundaries
+		$UNZIP -o $OUTDIR/land-polygons-complete-4326.zip -d $OUTDIR/world_boundaries
 		mv $OUTDIR/processed_p.[dis]* $OUTDIR/world_boundaries/
 	else
 		echo 'land-polygons-complete-4326.zip not present'
