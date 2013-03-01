@@ -50,6 +50,9 @@ def main():
     parser.add_option("-i", "--only-interesting", action="store_true", dest="onlyinteresting", 
                       help="only render around interesting places (buildings, peaks, islands, ...)")
 
+    parser.add_option("-D", "--db", action="store", type="string", dest="dsn", default="", 
+                      help="database connection string used for finding interesting places")
+    
     parser.add_option("-e", "--skip-existing", action="store_true", dest="skipexisting", 
                       help="skip existing tiles, only render missing")
     
@@ -71,14 +74,25 @@ def main():
     
     queue = multiprocessing.JoinableQueue(32)
     
-    for z in range(minzoom, maxzoom+1):
-        n = 2**z
-        for x in range(0, n):
-            for y in range(0, n):
-                if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
-                    continue
-                t = (z, x, y)
-                queue.put(t)
+    if options.onlyinteresting:
+        import psycopg2
+        con = psycopg2.connect(options.dsn)
+        sql = """SELECT ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
+            WHERE place IS NOT NULL
+            OR building IS NOT NULL
+            OR ("natural" is NULL AND "natural" != 'water');
+        """;
+        print sql
+    
+    else:
+        for z in range(minzoom, maxzoom+1):
+            n = 2**z
+            for x in range(0, n):
+                for y in range(0, n):
+                    if options.skipexisting and os.path.exists(dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type):
+                        continue
+                    t = (z, x, y)
+                    queue.put(t)
     
     if(options.threads > 1):
         lock = multiprocessing.Lock()
