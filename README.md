@@ -60,9 +60,14 @@ Quickstart
     wget http://download.geofabrik.de/openstreetmap/antarctica.osm.pbf
     osm2pgsql --create --cache 1024 --database $USER --prefix ant --latlong antarctica.osm.pbf
     
+    # render an image
     ./render_polar.py --style osm.xml --bbox -3000000,0,0,3000000 --file top-left --size 500x500
     
-    ./render_polar_tiles.py --maxzoom 4 --threads 4 --style osm.xml 
+    # render tiles
+    ./render_polar_tiles.py --minzoom 1 --maxzoom 4 --threads 4 --style osm.xml
+
+    # render tiles around stations, peaks, islands, ... (NOTE: currently only McMurdo is counted as interesting)
+    ./render_polar_tiles.py --minzoom 5 --maxzoom 18 --threads 4 --style osm.xml --only-interesting
     
     # show tiles via view.html
 
