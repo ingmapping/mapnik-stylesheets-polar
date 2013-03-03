@@ -94,7 +94,8 @@
 			controls: [
 				new OpenLayers.Control.Navigation(),
 				new OpenLayers.Control.PanZoomBar(),
-				new OpenLayers.Control.Attribution(), 
+				new OpenLayers.Control.Attribution(),
+				new OpenLayers.Control.LayerSwitcher(),
 				new OpenLayers.Control.Permalink({
 					anchor: true
 				})
@@ -118,12 +119,19 @@
 
 		map.addLayer(tiles);
 
-		var coord = new OpenLayers.LonLat(166.6696371, -77.8444739);
-		var marker = new OpenLayers.Marker(coord.transform("EPSG:4326", "EPSG:3031"));
-		var markers = new OpenLayers.Layer.Markers("Marker");
-
-		markers.addMarker(marker);
+		var markers = new OpenLayers.Layer.Vector("Markers", {
+			projection: 'EPSG:4326',
+			strategies: [new OpenLayers.Strategy.Fixed()],
+				protocol: new OpenLayers.Protocol.HTTP({
+				url: "interesting.json",
+				format: new OpenLayers.Format.GeoJSON()
+			})
+		});
 		map.addLayer(markers);
+
+		map.events.register('zoomend', this, function() {
+			markers.setVisibility(map.zoom < 8);
+		});
 
 		if(!map.getCenter())
 			map.setCenter(new OpenLayers.LonLat(0, 0)/* despite the class name, these are in EPSG:3031, so 0/0 is actually the pole */, 1);

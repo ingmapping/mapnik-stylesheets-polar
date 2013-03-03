@@ -7,7 +7,6 @@ from optparse import OptionParser
 import sys, os, multiprocessing
 import Queue
 from sets import Set
-from math import floor, ceil
 
 try:
     import mapnik
@@ -53,12 +52,15 @@ def main():
     parser.add_option("-i", "--only-interesting", action="store_true", dest="onlyinteresting", 
                       help="only render around interesting places (buildings, peaks, islands, ...)")
 
-    parser.add_option("-I", "--only-interesting-context", action="store", type="int", dest="context",
+    parser.add_option("-c", "--only-interesting-context", action="store", type="int", dest="context",
                       help="when rendering tiles around interesting places, how many tiles around those places should be rendered?"+
                       "0 means that only the tile with the interesting feature will be rendered; "+
                       "1 means that the 8 surrounding tiles will be rendered for each zoom level, too; "+
                       "2 adds 24 extra tiles; 3 adds 48 extra tiles; 4 adds 80 extra tiles; "+
                       "defaults to "+str(context)+", which should fill the most screens")
+
+    parser.add_option("-l", "--only-interesting-list", action="store", type="string", dest="listfile", 
+                      help="write a GeoJSON-List of interesting places")
 
     parser.add_option("-D", "--db", action="store", type="string", dest="dsn", default="", 
                       help="database connection string used for finding interesting places")
@@ -102,9 +104,10 @@ def main():
     if options.onlyinteresting:
         import psycopg2
         tileset = Set()
+        features = []
         con = psycopg2.connect(options.dsn)
         sql = """
-        SELECT osm_id, name, ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
+        SELECT osm_id, name, ST_X(way), ST_Y(way), ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
             WHERE place IS NOT NULL
             OR building IS NOT NULL
             OR ("natural" is NULL AND "natural" != 'water');
@@ -113,8 +116,21 @@ def main():
         cur.execute(sql)
         print "found %u interesting nodes" % (cur.rowcount)
         for record in cur:
-            (osm_id, name, xmeter, ymeter) = record
+            (osm_id, name, lat, lng, xmeter, ymeter) = record
             print "found interesting node #%u (%s)" % (osm_id, name)
+            if(options.listfile):
+                features += ({
+                    "type": "Feature",
+                    "properties": {
+                        "osm_id": osm_id,
+                        "name": name
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates" : [ lat, lng ] 
+                    }
+                },)
+
             for z in range(minzoom, maxzoom+1):
                 n = 2**z
                 n2 = n/2
@@ -128,9 +144,19 @@ def main():
                         absx = x+xctx
                         absy = y+yctx
                         t = (z, absx, absy)
-                        if absx >= 0 and absx < n and absy >= 0 and absy < n not t in tileset:
+                        if absx >= 0 and absx < n and absy >= 0 and absy < n and not t in tileset:
                             queue.put(t)
                             tileset.add(t)
+
+        if(options.listfile):
+            import json
+            f = open(options.listfile, "w")
+            f.write(json.dumps({
+                "type": "FeatureCollection",
+                "features": features
+                }
+            ))
+            f.close()
 
     else:
         for z in range(minzoom, maxzoom+1):
