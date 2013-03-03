@@ -6,6 +6,7 @@
 from optparse import OptionParser
 import sys, os, multiprocessing
 import Queue
+from sets import Set
 from math import floor, ceil
 
 try:
@@ -100,17 +101,20 @@ def main():
 
     if options.onlyinteresting:
         import psycopg2
+        tileset = Set()
         con = psycopg2.connect(options.dsn)
-        sql = "SELECT ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point WHERE osm_id = 515065315"
-        
-        #    WHERE place IS NOT NULL
-        #    OR building IS NOT NULL
-        #    OR ("natural" is NULL AND "natural" != 'water');
-        #""";
+        sql = """
+        SELECT osm_id, name, ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
+            WHERE place IS NOT NULL
+            OR building IS NOT NULL
+            OR ("natural" is NULL AND "natural" != 'water');
+        """;
         cur = con.cursor()
         cur.execute(sql)
+        print "found %u interesting nodes" % (cur.rowcount)
         for record in cur:
-            (xmeter, ymeter) = record
+            (osm_id, name, xmeter, ymeter) = record
+            print "found interesting node #%u (%s)" % (osm_id, name)
             for z in range(minzoom, maxzoom+1):
                 n = 2**z
                 n2 = n/2
@@ -123,8 +127,10 @@ def main():
                     for yctx in range(-context, context+1):
                         absx = x+xctx
                         absy = y+yctx
-                        if absx >= 0 and absx < n and absy >= 0 and absy < n:
-                            queue.put( (z, absx, absy) )
+                        t = (z, absx, absy)
+                        if absx >= 0 and absx < n and absy >= 0 and absy < n not t in tileset:
+                            queue.put(t)
+                            tileset.add(t)
 
     else:
         for z in range(minzoom, maxzoom+1):
