@@ -103,9 +103,9 @@ def main():
             for z in range(minzoom, maxzoom+1):
                 n = 2**z
                 n2 = n/2
-                tilesz = scale/n
-                xoff = xmeter / tilesz
-                yoff = ymeter / tilesz
+                tilesz = float(scale) / float(n)
+                xoff = float(xmeter) / tilesz
+                yoff = float(ymeter) / tilesz
                 x = int(xoff + n2)
                 y = int(n2 - yoff)
                 print "at z=%u a tile is %u meters, so coord %f/%f is %u/%u tiles away from the origin, which equals tile %u/%u at this zoom" % (z, tilesz, xmeter, ymeter, xoff, yoff, x, y)
@@ -144,7 +144,7 @@ class RenderThread:
 
     def run(self):
         print "Thread #%u started" % (self.threadnum)
-        m = mapnik.Map(255,255)
+        m = mapnik.Map(256,256)
         mapnik.load_map(m, self.style, True)
 
         if(m.buffer_size < 128):
@@ -171,7 +171,7 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
     x2n = x-n2
     y2n = (n-y-1)-n2
 
-    tilesize = scale / n;
+    tilesize = float(scale) / float(n);
 
     bbox = [
         tilesize * x2n,
