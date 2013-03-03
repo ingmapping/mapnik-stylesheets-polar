@@ -28,6 +28,7 @@ def main():
     minzoom = 1
     maxzoom = 6
     threads = 1
+    context = 3
     
     parser = OptionParser()
     parser.add_option("-s", "--style", action="store", type="string", dest="style", 
@@ -50,6 +51,13 @@ def main():
 
     parser.add_option("-i", "--only-interesting", action="store_true", dest="onlyinteresting", 
                       help="only render around interesting places (buildings, peaks, islands, ...)")
+
+    parser.add_option("-I", "--only-interesting-context", action="store", type="int", dest="context",
+                      help="when rendering tiles around interesting places, how many tiles around those places should be rendered?"+
+                      "0 means that only the tile with the interesting feature will be rendered; "+
+                      "1 means that the 8 surrounding tiles will be rendered for each zoom level, too; "+
+                      "2 adds 24 extra tiles; 3 adds 48 extra tiles; 4 adds 80 extra tiles; "+
+                      "defaults to "+str(context)+", which should fill the most screens")
 
     parser.add_option("-D", "--db", action="store", type="string", dest="dsn", default="", 
                       help="database connection string used for finding interesting places")
@@ -75,6 +83,9 @@ def main():
 
     if options.threads:
         threads = options.threads
+
+    if options.context != None:
+        context = options.context
     
     queue = multiprocessing.JoinableQueue(32)
     lock = multiprocessing.Lock()
@@ -108,9 +119,12 @@ def main():
                 yoff = float(ymeter) / tilesz
                 x = int(xoff + n2)
                 y = int(n2 - yoff)
-                print "at z=%u a tile is %u meters, so coord %f/%f is %u/%u tiles away from the origin, which equals tile %u/%u at this zoom" % (z, tilesz, xmeter, ymeter, xoff, yoff, x, y)
-                t = (z, x, y)
-                queue.put(t)
+                for xctx in range(-context, context+1):
+                    for yctx in range(-context, context+1):
+                        absx = x+xctx
+                        absy = y+yctx
+                        if absx >= 0 and absx < n and absy >= 0 and absy < n:
+                            queue.put( (z, absx, absy) )
 
     else:
         for z in range(minzoom, maxzoom+1):
