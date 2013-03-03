@@ -201,11 +201,11 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
     m.zoom_to_box(e)
     
     file = dir + "/" + str(z) + "/" + str(x) + "/" + str(y) + "." + type
-    s = mapnik.Image(255, 255)
+    s = mapnik.Image(256, 256)
     
     mapnik.render(m, s)
     
-    view = s.view(0, 0, 255, 255)
+    view = s.view(0, 0, 256, 256)
     view.save(file, type)
 
 if __name__ == "__main__":
