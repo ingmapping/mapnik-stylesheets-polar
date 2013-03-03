@@ -77,7 +77,6 @@ def main():
         threads = options.threads
     
     queue = multiprocessing.JoinableQueue(32)
-
     lock = multiprocessing.Lock()
 
     renderers = {}
@@ -101,30 +100,18 @@ def main():
         cur.execute(sql)
         for record in cur:
             (xmeter, ymeter) = record
-            print "meter", xmeter, ymeter
-            xfactor = xmeter / scale
-            yfactor = ymeter / scale
-
             for z in range(minzoom, maxzoom+1):
                 n = 2**z
-                x = int(round( (xfactor * n) + (n/2) ))
-                y = int(round( (n/2) - (yfactor * n) - 1 ))
+                n2 = n/2
+                tilesz = scale/n
+                xoff = xmeter / tilesz
+                yoff = ymeter / tilesz
+                x = int(xoff + n2)
+                y = int(n2 - yoff)
+                print "at z=%u a tile is %u meters, so coord %f/%f is %u/%u tiles away from the origin, which equals tile %u/%u at this zoom" % (z, tilesz, xmeter, ymeter, xoff, yoff, x, y)
+                t = (z, x, y)
+                queue.put(t)
 
-                queue.put( (z, x-1, y-1) )
-                queue.put( (z, x,   y-1) )
-                queue.put( (z, x+1, y-1) )
-                queue.put( (z, x-1, y  ) )
-                queue.put( (z, x,   y  ) )
-                queue.put( (z, x+1, y  ) )
-                queue.put( (z, x-1, y+1) )
-                queue.put( (z, x,   y+1) )
-                queue.put( (z, x+1, y+1) )
-
-        # idea 1: calculate tile numbers at minzoom, project to maxzoom (simpler)
-
-
-        # idea 2: add a buffer around the coords and render all tiles inside this bbox (more logic)
-    
     else:
         for z in range(minzoom, maxzoom+1):
             n = 2**z
@@ -196,14 +183,14 @@ def render_tile(m, z, x, y, scale, dir, type, lock=None, threadnum=None):
 
     if lock:
         lock.acquire()
-        print "Thread #%u: z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (threadnum, z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
+        print "Thread #%u: z=%u x=%u y=%u -> (%f,%f,%f,%f)" % (threadnum, z, x, y, bbox[0], bbox[1], bbox[2], bbox[3])
         if not os.path.exists(pdir):
             os.makedirs(pdir)
         lock.release()
     else:
         if not os.path.exists(pdir):
             os.makedirs(pdir)
-        print "z=%u x=%u y=%u -> n=%u, n2=%u -> (x2n=%u, y2n=%u) -> (%f,%f,%f,%f)" % (z, x, y, n, n2, x2n, y2n, bbox[0], bbox[1], bbox[2], bbox[3])
+        print "z=%u x=%u y=%u -> (%f,%f,%f,%f)" % (z, x, y, bbox[0], bbox[1], bbox[2], bbox[3])
 
     if mapnik.Box2d:
         e = mapnik.Box2d(*bbox)
