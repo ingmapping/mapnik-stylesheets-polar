@@ -83,22 +83,6 @@
 	<body>
 		<div id="map">
 			<div class="time">Last Update (of all Tiles): ###TIME###</div>
-			<div id="info">
-				
-				<h2>polar stereographic (EPSG:3031)</h2>
-				<strong>bbox:</strong> <span id="bbox">-</span><br />
-				<strong>zoom:</strong> <span id="zoom">-</span><br />
-				<strong>center:</strong> <span id="center">-</span><br />
-				<strong>mouse:</strong> <span id="mouse">-</span><br />
-				<strong>click:</strong> <span id="click">-</span>
-
-				<h2>plate carrée (EPSG:4326)</h2>
-				<strong>bbox:</strong> <span id="bboxlatlng">-</span><br />
-				<strong>zoom:</strong> <span id="zoomlatlng">-</span><br />
-				<strong>center:</strong> <span id="centerlatlng">-</span><br />
-				<strong>mouse:</strong> <span id="mouselatlng">-</span><br />
-				<strong>click:</strong> <span id="clicklatlng">-</span>
-			</div>
 		</div>
 
 		<script type="text/javascript">
@@ -117,32 +101,7 @@
 			],
 
 			projection: "EPSG:3031",
-			displayProjection: "EPSG:4326",
-
-			eventListeners: {
-				move: function(e) {
-					if(!map) return;
-					document.getElementById('bbox').innerHTML = map.getExtent().toBBOX();
-					document.getElementById('zoom').innerHTML = map.getZoom();
-					document.getElementById('center').innerHTML = map.getCenter().toShortString();
-					
-					document.getElementById('bboxlatlng').innerHTML = map.getExtent().transform(map.projection, map.displayProjection).toBBOX();
-					document.getElementById('zoomlatlng').innerHTML = map.getZoom();
-					document.getElementById('centerlatlng').innerHTML = map.getCenter().transform(map.projection, map.displayProjection).toShortString();
-				},
-				
-				mousemove: function(e) {
-					if(!map) return;
-					document.getElementById('mouse').innerHTML = map.getLonLatFromPixel(e.xy).toShortString();
-					document.getElementById('mouselatlng').innerHTML = map.getLonLatFromPixel(e.xy).transform(map.projection, map.displayProjection).toShortString();
-				},
-				
-				click: function(e) {
-					if(!map) return;
-					document.getElementById('click').innerHTML = map.getLonLatFromPixel(e.xy).toShortString();
-					document.getElementById('clicklatlng').innerHTML = map.getLonLatFromPixel(e.xy).transform(map.projection, map.displayProjection).toShortString();
-				}
-			}
+			displayProjection: "EPSG:4326"
 		});
 
 		var tiles = new OpenLayers.Layer.XYZ(
