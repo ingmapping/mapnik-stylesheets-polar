@@ -45,6 +45,37 @@
 		a {
 			color: black;
 		}
+
+
+		#info {
+			background-color: white;
+			
+			padding: 5px;
+			border: 2px solid red;
+			
+			position: absolute;
+			z-index: 10000;
+			
+			bottom: 10px;
+			right: 10px;
+			width: 600px;
+		}
+
+		#info strong {
+			display: block;
+			float: left;
+			width: 100px;
+		}
+
+		#info span {
+			display: block;
+			float: left;
+		}
+
+		#info br,
+		#info h2 {
+			clear: both;
+		}
 		</style>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/1.1.0/proj4js-compressed.js"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/openlayers/2.12/OpenLayers.js"></script>
@@ -52,6 +83,22 @@
 	<body>
 		<div id="map">
 			<div class="time">Last Update (of all Tiles): ###TIME###</div>
+			<div id="info">
+				
+				<h2>polar stereographic (EPSG:3031)</h2>
+				<strong>bbox:</strong> <span id="bbox">-</span><br />
+				<strong>zoom:</strong> <span id="zoom">-</span><br />
+				<strong>center:</strong> <span id="center">-</span><br />
+				<strong>mouse:</strong> <span id="mouse">-</span><br />
+				<strong>click:</strong> <span id="click">-</span>
+
+				<h2>plate carrée (EPSG:4326)</h2>
+				<strong>bbox:</strong> <span id="bboxlatlng">-</span><br />
+				<strong>zoom:</strong> <span id="zoomlatlng">-</span><br />
+				<strong>center:</strong> <span id="centerlatlng">-</span><br />
+				<strong>mouse:</strong> <span id="mouselatlng">-</span><br />
+				<strong>click:</strong> <span id="clicklatlng">-</span>
+			</div>
 		</div>
 
 		<script type="text/javascript">
@@ -70,7 +117,32 @@
 			],
 
 			projection: "EPSG:3031",
-			displayProjection: "EPSG:4326"
+			displayProjection: "EPSG:4326",
+
+			eventListeners: {
+				move: function(e) {
+					if(!map) return;
+					document.getElementById('bbox').innerHTML = map.getExtent().toBBOX();
+					document.getElementById('zoom').innerHTML = map.getZoom();
+					document.getElementById('center').innerHTML = map.getCenter().toShortString();
+					
+					document.getElementById('bboxlatlng').innerHTML = map.getExtent().transform(map.projection, map.displayProjection).toBBOX();
+					document.getElementById('zoomlatlng').innerHTML = map.getZoom();
+					document.getElementById('centerlatlng').innerHTML = map.getCenter().transform(map.projection, map.displayProjection).toShortString();
+				},
+				
+				mousemove: function(e) {
+					if(!map) return;
+					document.getElementById('mouse').innerHTML = map.getLonLatFromPixel(e.xy).toShortString();
+					document.getElementById('mouselatlng').innerHTML = map.getLonLatFromPixel(e.xy).transform(map.projection, map.displayProjection).toShortString();
+				},
+				
+				click: function(e) {
+					if(!map) return;
+					document.getElementById('click').innerHTML = map.getLonLatFromPixel(e.xy).toShortString();
+					document.getElementById('clicklatlng').innerHTML = map.getLonLatFromPixel(e.xy).transform(map.projection, map.displayProjection).toShortString();
+				}
+			}
 		});
 
 		var tiles = new OpenLayers.Layer.XYZ(
