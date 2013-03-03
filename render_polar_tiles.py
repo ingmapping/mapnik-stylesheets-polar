@@ -21,7 +21,7 @@ except ImportError:
     cairo_exists = False
 
 def main():
-    style = "/usr/share/osm-mapnik/osm.xml"
+    style = os.path.dirname(os.path.abspath(__file__))+"/osm.xml"
     dir = "tiles"
     type = "png"
     scale = 6000000
@@ -31,7 +31,7 @@ def main():
     
     parser = OptionParser()
     parser.add_option("-s", "--style", action="store", type="string", dest="style", 
-                      help="path to the mapnik stylesheet xml, dmefaults to the openstreetmap default style: "+style)
+                      help="path to the mapnik stylesheet xml, defaults to: "+style)
     
     parser.add_option("-d", "--dir", action="store", type="string", dest="dir", 
                       help="path to the destination folder, defaults to "+type)
