@@ -114,10 +114,15 @@ def main():
         """;
         cur = con.cursor()
         cur.execute(sql)
+        lock.acquire()
         print "found %u interesting nodes" % (cur.rowcount)
+        lock.release()
+        i = 0
         for record in cur:
             (osm_id, name, lat, lng, xmeter, ymeter) = record
-            print "found interesting node #%u (%s)" % (osm_id, name)
+            lock.acquire()
+            print "found interesting node %u of %u: #%u (%s)" % (++i, cur.rowcount, osm_id, name)
+            lock.release()
             if(options.listfile):
                 features += ({
                     "type": "Feature",
