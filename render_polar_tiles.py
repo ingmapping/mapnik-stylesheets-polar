@@ -6,7 +6,6 @@
 from optparse import OptionParser
 import sys, os, multiprocessing
 import Queue
-from sets import Set
 
 try:
     import mapnik
@@ -103,7 +102,7 @@ def main():
 
     if options.onlyinteresting:
         import psycopg2
-        tileset = Set()
+        tileset = set()
         features = []
         con = psycopg2.connect(options.dsn)
         sql = """
