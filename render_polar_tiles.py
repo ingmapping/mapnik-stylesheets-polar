@@ -106,10 +106,25 @@ def main():
         features = []
         con = psycopg2.connect(options.dsn)
         sql = """
-        SELECT osm_id, name, ST_X(way), ST_Y(way), ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
-            WHERE place IS NOT NULL
+        SELECT 'point' AS type, osm_id, name, ST_X(way), ST_Y(way), ST_X(ST_Transform(way, 3031)), ST_Y(ST_Transform(way, 3031)) FROM ant_point
+            WHERE (place IS NOT NULL AND place IN ('hamlet', 'town', 'isolated_dwelling', 'cape', 'locality', 'island', 'islet'))
             OR building IS NOT NULL
-            OR ("natural" is NULL AND "natural" != 'water');
+            OR aeroway IS NOT NULL
+            OR ("natural" IS NOT NULL AND "natural" IN ('volcano', 'ridge', 'cliff', 'cape', 'peak', 'valley', 'bay'))
+
+        UNION  ALL
+
+        SELECT 'line' AS type, osm_id, name, ST_X(ST_Centroid(way)), ST_Y(ST_Centroid(way)), ST_X(ST_Transform(ST_Centroid(way), 3031)), ST_Y(ST_Transform(ST_Centroid(way), 3031)) FROM ant_line
+            WHERE (place IS NOT NULL AND place IN ('hamlet', 'town', 'isolated_dwelling', 'cape', 'locality', 'island', 'islet'))
+            OR building IS NOT NULL
+            OR aeroway IS NOT NULL
+
+        UNION  ALL
+
+        SELECT 'polygon' AS type, osm_id, name, ST_X(ST_Centroid(way)), ST_Y(ST_Centroid(way)), ST_X(ST_Transform(ST_Centroid(way), 3031)), ST_Y(ST_Transform(ST_Centroid(way), 3031)) FROM ant_polygon
+            WHERE (place IS NOT NULL AND place IN ('hamlet', 'town', 'isolated_dwelling', 'cape', 'locality', 'island', 'islet'))
+            OR building IS NOT NULL
+            OR aeroway IS NOT NULL;
         """;
         cur = con.cursor()
         cur.execute(sql)
@@ -118,9 +133,9 @@ def main():
         lock.release()
         i = 0
         for record in cur:
-            (osm_id, name, lat, lng, xmeter, ymeter) = record
+            (obj_type, osm_id, name, lat, lng, xmeter, ymeter) = record
             lock.acquire()
-            print "found interesting node %u of %u: #%u (%s)" % (++i, cur.rowcount, osm_id, name)
+            print "found interesting %s %u of %u: #%u (%s)" % (obj_type, ++i, cur.rowcount, osm_id, name)
             lock.release()
             if(options.listfile):
                 features += ({
