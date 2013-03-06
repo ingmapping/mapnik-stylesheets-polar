@@ -74,7 +74,7 @@
     <StyleName>admin-01234</StyleName>
     <Datasource>
       <Parameter name="table">
-      (select way,admin_level
+      (select ST_Segmentize(way,&segmentize;) AS way,admin_level
        from &prefix;_roads
        where "boundary"='administrative'
          and admin_level in ('0','1','2','3','4')
@@ -86,7 +86,7 @@
     <StyleName>admin-5678</StyleName>
     <Datasource>
       <Parameter name="table">
-      (select way,admin_level
+      (select ST_Segmentize(way,&segmentize;) AS way,admin_level
        from &prefix;_roads
        where "boundary"='administrative'
          and admin_level in ('5','6','7','8')
@@ -98,7 +98,7 @@
     <StyleName>admin-other</StyleName>
     <Datasource>
       <Parameter name="table">
-      (select way,admin_level
+      (select ST_Segmentize(way,&segmentize;) AS way,admin_level
        from &prefix;_roads
        where "boundary"='administrative'
          and (admin_level is null or admin_level not in ('0','1','2','3','4','5','6','7','8'))
