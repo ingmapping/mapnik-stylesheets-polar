@@ -23,8 +23,8 @@ def main():
     file = "map"
     type = "png"
     width = 800
-    height = 600
-    bbox = (-180, -90, 180, 90)
+    height = 800
+    bbox = (-3000000, -3000000, 3000000, 3000000)
     
     parser = OptionParser()
     parser.add_option("-s", "--style", action="store", type="string", dest="style", 
