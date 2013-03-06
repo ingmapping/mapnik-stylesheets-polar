@@ -2,3 +2,10 @@ inc/datasource-settings.xml.inc
 inc/fontset-settings.xml.inc
 inc/settings.xml.inc
 world_boundaries
+tiles
+
+antarctica.osm.pbf
+land-polygons-complete-4326.zip
+ne_10m_populated_places.zip
+ne_110m_admin_0_boundary_lines_land.zip
+world_boundaries-spherical.tgz
