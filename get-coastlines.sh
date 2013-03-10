@@ -49,6 +49,7 @@ $WGET http://tile.openstreetmap.org/world_boundaries-spherical.tgz -O $OUTDIR/wo
 $WGET http://data.openstreetmapdata.com/land-polygons-complete-4326.zip
 $WGET http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places.zip -O $OUTDIR/ne_10m_populated_places.zip
 $WGET http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_boundary_lines_land.zip -O $OUTDIR/ne_110m_admin_0_boundary_lines_land.zip
+$WGET http://polar.openstreetmap.de/antarctica/hillshade/hillshade.tiff -O $OUTDIR/hillshade/hillshade.tiff
 
 $TAR xvf $OUTDIR/world_boundaries-spherical.tgz -C $OUTDIR
 

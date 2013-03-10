@@ -3352,6 +3352,7 @@
 &layer-landcover;
 &layer-water;
 &layer-water_features;
+&layer-hillshade;
 <Layer name="tunnels" status="on" srs="&osm2pgsql_projection;">
     <StyleName>tunnels-casing</StyleName>
     <StyleName>tunnels-fill</StyleName>
