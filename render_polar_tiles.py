@@ -205,10 +205,15 @@ class RenderThread:
         self.type = type
         self.lock = lock
         self.style = style
+        self.lock.acquire()
         print "Thread #%u created" % (threadnum)
+        self.lock.release()
 
     def run(self):
+        self.lock.acquire()
         print "Thread #%u started" % (self.threadnum)
+        self.lock.release()
+
         m = mapnik.Map(256,256)
         mapnik.load_map(m, self.style, True)
 
