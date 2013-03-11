@@ -129,6 +129,18 @@
 		});
 		map.addLayer(markers);
 
+		var featctl = new OpenLayers.Control.SelectFeature(markers);
+		map.addControl(featctl);
+		featctl.activate();
+
+		featctl.events.register('featurehighlighted', this, function(e) {
+			var
+				pt = e.feature.geometry,
+				ll = new OpenLayers.LonLat(pt.x, pt.y);
+
+			map.setCenter(ll, 11);
+		});
+
 		map.events.register('zoomend', this, function() {
 			markers.setVisibility(map.zoom < 8);
 		});
