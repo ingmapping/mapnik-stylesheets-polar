@@ -135,7 +135,8 @@ def main():
         for record in cur:
             (obj_type, osm_id, name, lat, lng, xmeter, ymeter) = record
             lock.acquire()
-            print "found interesting %s %u of %u: #%u (%s)" % (obj_type, ++i, cur.rowcount, osm_id, name)
+            i += 1
+            print "found interesting %s %u of %u: #%u (%s)" % (obj_type, i, cur.rowcount, osm_id, name)
             lock.release()
             if(options.listfile):
                 features += ({
