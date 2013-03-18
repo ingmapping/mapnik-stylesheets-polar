@@ -38,7 +38,21 @@
 			z-index: 9999;
 		}
 
-		.olControlAttribution:hover, .time:hover {
+		.olControlScaleLine {
+			background: white;
+			opacity: 0.3;
+
+			z-index: 9999;
+
+			position: absolute;
+			bottom: 10px !important;
+			right: 10px !important;
+			left: auto !important;
+
+			padding: 5px 10px;
+		}
+
+		.olControlAttribution:hover, .olControlScaleLine:hover, .time:hover {
 			opacity: 0.8;
 		}
 
@@ -96,6 +110,7 @@
 				new OpenLayers.Control.PanZoomBar(),
 				new OpenLayers.Control.Attribution(),
 				new OpenLayers.Control.LayerSwitcher(),
+				new OpenLayers.Control.ScaleLine(),
 				new OpenLayers.Control.Permalink({
 					anchor: true
 				})
