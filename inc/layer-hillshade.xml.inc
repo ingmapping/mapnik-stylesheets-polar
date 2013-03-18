@@ -1,6 +1,6 @@
 <Style name="hillshade">
 	<Rule>
-		<RasterSymbolizer opacity="0.5" scaling="bilinear8" />
+		<RasterSymbolizer opacity="0.3" scaling="bilinear8" />
 	</Rule>
 </Style>
 

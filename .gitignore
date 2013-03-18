@@ -3,6 +3,7 @@ inc/fontset-settings.xml.inc
 inc/settings.xml.inc
 world_boundaries
 tiles
+hillshade/*.tiff
 
 antarctica.osm.pbf
 land-polygons-complete-4326.zip
