@@ -27,13 +27,6 @@
     </Rule>
 </Style>
   <!-- BUILTUP VMAP0 -->
-<Style name="builtup">
-    <Rule>
-      &maxscale_zoom8;
-      &minscale_zoom10;
-      <PolygonSymbolizer fill="#ddd"/>
-    </Rule>
-</Style>
 <Layer name="world" status="on" srs="&srs4326;">
     <StyleName>world</StyleName>
     <Datasource>
@@ -46,13 +39,6 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">&world_boundaries;/land-polygons-complete-4326/land_polygons</Parameter>
-    </Datasource>
-</Layer>
-<Layer name="builtup" status="off" srs="&srsmercator;">
-    <StyleName>builtup</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">&world_boundaries;/builtup_area</Parameter>
     </Datasource>
 </Layer>
 <Layer name="necountries" status="on" srs="&srs4326;">
