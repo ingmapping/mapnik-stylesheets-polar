@@ -1,4 +1,3 @@
-
 Rendering OpenStreetMap with Mapnik into Polar-Centric Tiles or Images
 ----------------------------------------------------------------------
 
@@ -11,7 +10,7 @@ Welcome, if you have Mapnik and osm2pgsql installed and you want
 to render your own OSM tiles, you've come to the right place.
 
 This is the development location of the Mapnik XML stylesheets powering
-http://polar.openstreetmap.de/antarctica/
+http://polar.openstreetmap.de/
 
 This directory also holds an assortment of helpful utility scripts for
 working with Mapnik and the OSM Mapnik XML stylesheets.
