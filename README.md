@@ -3,7 +3,7 @@ Rendering OpenStreetMap with Mapnik into Polar-Centric Tiles or Images
 
 ![alt text](https://github.com/ingmapping/mapnik-stylesheets-polar/blob/master/demo.gif)
 
-[View Demo](https://tileserver.ingmapping.com/osm-antarctica/index.html)
+[View Demo](https://tileserver.ingmapping.com/osm_antarctica/index.html)
 
 Welcome, if you have Mapnik and osm2pgsql installed and you want to render your own OSM tiles of the Antarctic Polar region , you've come to the right place. Due to the position of Antarctica around the South Pole the usual map web map projections e.g. [Web Mercator](https://epsg.io/3857) show Antarctica rather distorted. This project can help you if you want to generate raster tiles of the Antartica based on OpenStreetMap and Natural Earth data in custom [WGS 84 / Antarctic Polar Stereographic projection](https://epsg.io/3031) with tools like Mapnik and osm2pgsql.
 
