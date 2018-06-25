@@ -1,15 +1,14 @@
 Rendering OpenStreetMap with Mapnik into Polar-Centric Tiles or Images
 ----------------------------------------------------------------------
 
-***
-The Style and the supplied Tools are specialized for rendering Polar Regions. For other stylesheets see:  https://github.com/openstreetmap/mapnik-stylesheets or https://github.com/gravitystorm/openstreetmap-carto. 
-***
-
 Welcome, if you have Mapnik and osm2pgsql installed and you want to render your own OSM tiles of the Antarctic Polar region , you've come to the right place. Due to the position of Antarctica around the South Pole the usual map web map projections e.g. [Web Mercator](https://epsg.io/3857) show Antarctica rather distorted. This project can help you if you want to generate raster tiles of the Antartica based on OpenStreetMap and Natural Earth data in custom [WGS 84 / Antarctic Polar Stereographic projection](https://epsg.io/3031) with tools like Mapnik and osm2pgsql.
 
 This project was forked from https://github.com/MaZderMind/mapnik-stylesheets-polar which is the development location of the Mapnik XML stylesheets powering http://polar.openstreetmap.de/. The website is not working anymore since the OSM Antarctica Map is currently unmaintained. 
 
 To this new directory, modifications (e.g. links and instructions) have been made in order to update the project and make it work again. The update.sh script was taken from another fork: https://github.com/giggls/mapnik-stylesheets-polar and updated for proper use here. 
+
+The Style and the supplied tools are specialized for rendering Polar Regions. For other stylesheets see:  https://github.com/openstreetmap/mapnik-stylesheets or https://github.com/gravitystorm/openstreetmap-carto. 
+
 
 Quick References
 ----------------
@@ -45,19 +44,20 @@ Antarctica data in PostGIS
 Quickstart
 ----------
 
+````
     git clone https://github.com/ingmapping/mapnik-stylesheets-polar.git mapnik-stylesheets-polar
     cd mapnik-stylesheets-polar
     ./update.sh
-   
+````
 
 Instructions to generate tiles with render_polar_tiles.py (if update.sh script was not used)
 ----------
-First, load antarctica osm data into your postgis database. 
 
-    osm2pgsql --create --database antarctica --latlong --prefix ant --style=osm2pgsql.style --cache 2000 data/antarctica-     latest.osm.pbf
+````
+    # First, load antarctica osm data into your postgis database. 
+    osm2pgsql --create --database antarctica --latlong --prefix ant --style=osm2pgsql.style --cache 2000 data/antarctica-   latest.osm.pbf
 
-Afterwards, create the 'inc' files with generate_xml.py or by manually creating them.
-
+    # Afterwards, create the 'inc' files with generate_xml.py or by manually creating them.
     ./generate_xml.py --accept-none --dbname antarctica --prefix ant --epsg=4326 --world_boundaries=/mapnik-stylesheets-polar/data
     
     # render an image
@@ -70,7 +70,7 @@ Afterwards, create the 'inc' files with generate_xml.py or by manually creating 
     ./render_polar_tiles.py --style=osm.xml --dir=../antarctica_tiles/tiles --minzoom=8 --maxzoom=18 --db=dbname=antarctica --only-   interesting 
     
     # show tiles via view.html, which should be in the antarctica_tiles folder. If the tiles don't load, check the path to the tiles inside the view.html file.
-
+````
 
 Manually editing 'inc' files
 ----------------------------
