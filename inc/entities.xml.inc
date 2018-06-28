@@ -6,6 +6,7 @@
 <!ENTITY srsmercator "+proj=merc +datum=WGS84 +over">
 <!ENTITY srs4326 "+init=epsg:4326">
 <!ENTITY srs3031 "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs">
+<!ENTITY srs3412 "+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs">
 <!ENTITY % layers SYSTEM "layers.xml.inc">
 %layers;
 <!ENTITY maxscale_zoom0 "<MaxScaleDenominator>250000000000</MaxScaleDenominator>">
